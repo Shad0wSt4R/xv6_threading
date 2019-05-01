@@ -3,6 +3,11 @@
 #include "fcntl.h"
 #include "user.h"
 #include "x86.h"
+#include "param.h"
+#include "syscall.h"
+#include "traps.h"
+#include "fs.h"
+#define PGSIZE 4096
 
 //new user libraries for lock functions
 //for lock_t typedef, see user.h
