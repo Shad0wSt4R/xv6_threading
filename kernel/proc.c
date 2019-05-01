@@ -498,3 +498,54 @@ join(void){
     sleep(proc, &ptable.lock);  //DOC: wait-sleep  
   }
 }
+
+int
+clone(void){
+  //ADDED FOR CLONE FUNCTIONALITY
+  uint ustack[2];
+  void(*fcn)(void*);
+  void *arg;
+  void *stack;
+  if((uint)stack%PGSIZE != 0){
+    return -1;
+  }
+  if((proc->sz - (uint)stack) <PGSIZE){
+    return -1;
+  }
+  //END ADDED SECTION uint ustack[2];
+  
+  //below is copied and slightly modified from fork()
+  int i, pid;
+  struct proc *np;
+  
+  // Allocate process.
+  if((np = allocproc()) == 0)
+    return -1;
+
+  // Copy process state from p --THIS SECTION HEAVILY MODIFIED FOR COPY()
+  np->pgdir = proc->pgdir;
+  np->sz = proc->sz;
+  np->parent = proc;
+  *np->tf = *proc->tf;
+  np->tf->esp = (uint)stack+PGSIZE;
+  np->tstack = (uint)stack;
+  ustack[0] = 0xffffffff;
+  ustack[1] = (uint)arg;
+  np->tf->esp -= (2)*4;
+  copyout(np->pgdir, np->tf->esp,ustack,(2)*4);
+
+  // Clear %eax so that fork returns 0 in the child.
+  np->tf->eax = 0;
+  np->tf->eip = (uint)fcn;//ADDED FOR CLONE()
+  np->tf->ebp = np->tf->esp;//ADDED FOR CLONE()
+
+  for(i = 0; i < NOFILE; i++)
+    if(proc->ofile[i])
+      np->ofile[i] = filedup(proc->ofile[i]);
+  np->cwd = idup(proc->cwd);
+
+  pid = np->pid;
+  np->state = RUNNABLE;
+  safestrcpy(np->name, proc->name, sizeof(proc->name));
+  return pid;
+}
