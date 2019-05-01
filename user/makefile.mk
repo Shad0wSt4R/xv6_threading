@@ -29,7 +29,7 @@ USER_PROGS := \
 	T_multi\
 	T_noexit\
 	T_size\
-	T_stacks\
+	T_stack\
 	T_thread\
 	T_thread2
 
