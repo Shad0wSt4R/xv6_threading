@@ -2,6 +2,10 @@
 #define _USER_H_
 
 struct stat;
+//LOCK_T STRUCT DEFINITION
+typedef struct lock_t{
+  int locked;
+}lock_t;
 
 // system calls
 int fork(void);
@@ -25,7 +29,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-int clone(void (*)(void*),void*,void*); //CLONE HERE
+int clone(void(*fcn)(void*),void *arg,void *stack); //CLONE HERE
 int join(void**); //JOIN HERE
 
 // user library functions (ulib.c)
@@ -43,11 +47,11 @@ void free(void*);
 int atoi(const char*);
 
 //mini proj 4 functions
-int thread_create(void (*)(void*)(void*),void*);
-int thread_join(void);
-void lock_init(volatile lock_t*);
-void lock_aquire(volatile lock_t*);
-void lock_release(volatile lock_t*);
+int thread_create(void (*start_routine)(void*),void *arg);
+int thread_join();
+void lock_init(lock_t *lt);
+void lock_aquire(lock_t *lt);
+void lock_release(lock_t *lt);
 
 #endif // _USER_H_
 
