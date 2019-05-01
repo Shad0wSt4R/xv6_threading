@@ -50,7 +50,7 @@ int atoi(const char*);
 int thread_create(void (*start_routine)(void*),void *arg);
 int thread_join();
 int lock_init(lock_t *lt);
-void lock_aquire(lock_t *lt);
+void lock_acquire(lock_t *lt);
 void lock_release(lock_t *lt);
 
 #endif // _USER_H_
