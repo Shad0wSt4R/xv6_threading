@@ -4,7 +4,7 @@
 struct stat;
 //LOCK_T STRUCT DEFINITION
 typedef struct lock_t{
-  int locked;
+  volatile uint locked;
 }lock_t;
 
 // system calls
