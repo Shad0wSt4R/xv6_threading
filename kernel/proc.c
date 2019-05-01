@@ -482,7 +482,7 @@ join(void){
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
-	*((int*)((int*)stack))=p->stack; //adjusts stack of proc
+	*((int*)((int*)stack))=p->tstack; //adjusts stack of proc
         release(&ptable.lock);
         return pid;
       }
