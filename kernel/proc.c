@@ -217,6 +217,10 @@ wait(void)
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->parent != proc)
         continue;
+      //check address space. We want a child proc with different pgdir. skip all those that don't fit this criteria.
+      if(p->pgdir == proc->pgdir && p->pid !=0 && p->state == ZOMBIE){
+	continue;
+      }
       havekids = 1;
       if(p->state == ZOMBIE){
         // Found one.
