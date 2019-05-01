@@ -88,3 +88,14 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+//NEW SYSCALL FUNCTIONS
+int
+sys_clone(void){
+  return clone();
+}
+
+int
+sys_join(void){
+  return join();
+}
