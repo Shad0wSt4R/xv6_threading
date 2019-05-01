@@ -12,17 +12,17 @@
 //new user libraries for lock functions
 //for lock_t typedef, see user.h
 int lock_init(lock_t *lk){
-  lk->flag = 0;
+  lk->locked = 0;
   return 0;
 }
 
-int lock_acquire(lock_t *lk){
-  while(xchg(&lk->flag,1) != 0)
+void lock_acquire(lock_t *lk){
+  while(xchg(&lk->locked,1) != 0)
     ; //keep spinning
 }
 
-int lock_release(lock_t *lk){
-  xchg($lk->flag,0);
+void lock_release(lock_t *lk){
+  xchg($lk->locked,0);
 }
 
 int thread_create(void (*start_routine)(void*),void *arg){
