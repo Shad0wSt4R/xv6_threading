@@ -49,7 +49,7 @@ int atoi(const char*);
 //mini proj 4 functions
 int thread_create(void (*start_routine)(void*),void *arg);
 int thread_join();
-void lock_init(lock_t *lt);
+int lock_init(lock_t *lt);
 void lock_aquire(lock_t *lt);
 void lock_release(lock_t *lt);
 
