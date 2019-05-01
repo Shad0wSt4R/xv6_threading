@@ -92,15 +92,6 @@ sys_uptime(void)
 //NEW SYSCALL FUNCTIONS
 int
 sys_clone(void){
-  if(argptr(0,(void*)&fcn,sizeof(fcn) < 0)){
-    return -1;
-  }
-  if(argptr(1,(void*)&arg,sizeof(arg) < 0)){
-    return -1;
-  }
-  if(argptr(2,(void*)&stack,sizeof(stack) < 0)){
-    return -1;
-  }
   return clone();
 }
 
