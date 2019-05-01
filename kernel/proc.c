@@ -447,4 +447,54 @@ procdump(void)
   }
 }
 
+//join will make parent thread wait for child (mostly copy/pasted from wait())
+int
+join(void){
+  void **stack;
+  if(argptr(0,(void*)&stack,sizeof(stack) <0)){
+    return -1; //FAILED, INCORRECT INPUT
+  }
+  if((proc->sz - (uint)stack) < sizeof(void**))
+    return -1;
+  struct proc *p;
+  int havethreads,pid;
 
+  acquire(&ptable.lock);
+  for(;;){ //forever loop
+    //scan through table looking for zombie threads
+    havethreads = 0;
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      //if it is not a thread, then continue scanning the pgtable
+      if(p->pgdir != proc->pgdir){
+	continue;
+      }
+      if(p->parent != proc)
+        continue;
+      havethreads = 1;
+      if(p->state == ZOMBIE){
+        // Found one.
+        pid = p->pid;
+        kfree(p->kstack);
+        p->kstack = 0;
+        freevm(p->pgdir);
+        p->state = UNUSED;
+        p->pid = 0;
+        p->parent = 0;
+        p->name[0] = 0;
+        p->killed = 0;
+	*((int*)((int*)stack))=p->stack; //adjusts stack of proc
+        release(&ptable.lock);
+        return pid;
+      }
+    }
+
+    // No point waiting if we don't have any children.
+    if(!havethreads || proc->killed){
+      release(&ptable.lock);
+      return -1;
+    }
+
+    // Wait for children to exit.  (See wakeup1 call in proc_exit.)   
+    sleep(proc, &ptable.lock);  //DOC: wait-sleep  
+  }
+}
