@@ -190,18 +190,20 @@ exit(void)
   // Pass abandoned children to init.
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     //added pgdir to account for threads now as well as procs
-    if(p->parent == proc && p->pgdir != proc->pgdir){
+    if(p->parent == proc){
+      if(p->pgdir != proc->pgdir){
         p->parent = initproc;
         if(p->state == ZOMBIE)
-          wakeup1(initproc);
+ 	  wakeup1(initproc);
+      }
+      else{ //ADDED FOR MINI PROJ 4
+        //when parent exit, if it has threads then it needs to be set to 0
+        //when waiting for parent, it is checked for any children.
+        //if parent field of thread is not cleared, then in wait() thread will be set to initproc. shell starts again.
+        p->parent = 0;
+        p->state = ZOMBIE;
+     }
     }
-    /* else{ //ADDED FOR MINI PROJ 4
-      //when parent exit, if it has threads then it needs to be set to 0
-      //when waiting for parent, check if parent has children.
-      //if parent field of thread is not cleared, then in wait() thread will be set to initproc. shell starts again.
-      p->parent = 0;
-      p->state = ZOMBIE;
-      }*/
   }
 
   // Jump into the scheduler, never to return.
@@ -225,8 +227,8 @@ wait(void)
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->parent != proc)
         continue;
-      //check address space. We want a child proc with different pgdir. skip all those that don't fit this criteria.
-      if(p->pgdir == proc->pgdir && p->pid !=0 && p->state == ZOMBIE){
+      //check address space. is p is a parent then do not wait (continue). Wait only for child
+      if(p->pgdir == proc->pgdir && p->pid!=0 && p->state==ZOMBIE){
 	continue;
       }
       havekids = 1;
