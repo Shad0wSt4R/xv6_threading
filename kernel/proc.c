@@ -189,21 +189,19 @@ exit(void)
 
   // Pass abandoned children to init.
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if(p->parent == proc){
-      //if a thread, clear out parent value of the thread (otherwise will cause issues in wait()) --ADDED FOR MIN PROJ4
-      if(p->pgdir != proc->pgdir){
+    //added pgdir to account for threads now as well as procs
+    if(p->parent == proc && p->pgdir != proc->pgdir){
         p->parent = initproc;
         if(p->state == ZOMBIE)
           wakeup1(initproc);
-      }
     }
-    else{ //ADDED FOR MINI PROJ 4
+    /* else{ //ADDED FOR MINI PROJ 4
       //when parent exit, if it has threads then it needs to be set to 0
       //when waiting for parent, check if parent has children.
       //if parent field of thread is not cleared, then in wait() thread will be set to initproc. shell starts again.
       p->parent = 0;
       p->state = ZOMBIE;
-    }
+      }*/
   }
 
   // Jump into the scheduler, never to return.
